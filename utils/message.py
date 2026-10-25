@@ -1,0 +1,324 @@
+from utils.emoji import EmojiTag
+
+
+class Messages:
+    # ── Playback & Queue Cards ─────────────────────────────────────────────
+    PLAY = (
+        f"{EmojiTag.PLAY} <b>ɴᴏᴡ ᴘʟᴀʏɪɴɢ</b>\n"
+        "{5}"
+        "<p>\n"
+        "<b>‣ ᴛɪᴛʟᴇ:</b> {1}<br/>\n"
+        "<b>‣ ᴅᴜʀᴀᴛɪᴏɴ:</b> <code>{2}</code><br/>\n"
+        "<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {3}<br/>\n"
+        "<b>‣ ᴍᴏᴅᴇ:</b> <code>{0}</code>\n"
+        "</p>\n\n"
+        "{4}"
+    )
+    NOW_PLAYING = PLAY
+
+    QUEUE = (
+        f"{EmojiTag.ADD} <b>ᴀᴅᴅᴇᴅ ᴛᴏ ǫᴜᴇᴜᴇ</b>\n\n"
+        "<b>‣ ᴛɪᴛʟᴇ:</b> {1}\n"
+        "<b>‣ ᴅᴜʀᴀᴛɪᴏɴ:</b> <code>{2}</code>\n"
+        "<b>‣ ᴘᴏsɪᴛɪᴏɴ:</b> {3}\n"
+        "<b>‣ ᴍᴏᴅᴇ:</b> <code>{0}</code>"
+    )
+
+    # ── Controls Status ───────────────────────────────────────────────────
+    NO_STREAM = f"{EmojiTag.ERROR} <b>ɴᴏ ᴀᴄᴛɪᴠᴇ sᴛʀᴇᴀᴍ ʀɪɢʜᴛ ɴᴏᴡ.</b>"
+    NO_ACTIVE_VC = f"{EmojiTag.WARNING} <b>ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜰᴏᴜɴᴅ.</b>\n<i>ᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜰɪʀsᴛ, ᴏʀ ᴍᴀᴋᴇ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴ ᴀᴅᴍɪɴ ᴛᴏ sᴛᴀʀᴛ ɪᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ.</i>"
+    VOICE_CHAT_NOT_FOUND = NO_ACTIVE_VC
+    NO_ACTIVE_VC_CHANNEL = f"{EmojiTag.WARNING} <b>ɴᴏ ᴀᴄᴛɪᴠᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ꜰᴏᴜɴᴅ ɪɴ ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ.</b>\n<i>ᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ᴛʜᴇ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ ɪɴ ʏᴏᴜʀ ᴄʜᴀɴɴᴇʟ ꜰɪʀsᴛ, ᴏʀ ᴍᴀᴋᴇ ᴛʜᴇ ᴀssɪsᴛᴀɴᴛ ᴀɴ ᴀᴅᴍɪɴ ɪɴ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴛᴏ sᴛᴀʀᴛ ɪᴛ ᴀᴜᴛᴏᴍᴀᴛɪᴄᴀʟʟʏ.</i>"
+    SKIPPING = f"{EmojiTag.SKIP} <b>sᴋɪᴘᴘɪɴɢ ᴄᴜʀʀᴇɴᴛ ᴛʀᴀᴄᴋ...</b>\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    SKIPPED_EMPTY = f"{EmojiTag.SKIP} <b>ǫᴜᴇᴜᴇ ɪs ᴇᴍᴘᴛʏ ɴᴏᴡ.</b>\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    SKIPPED_AUTOPLAY = f"{EmojiTag.SKIP} <b>ǫᴜᴇᴜᴇ ɪs ᴇᴍᴘᴛʏ — ᴀᴜᴛᴏᴘʟᴀʏɪɴɢ ᴀ ʀᴇʟᴀᴛᴇᴅ ᴛʀᴀᴄᴋ…</b>"
+    RESUMED = f"{EmojiTag.RESUME} <b>ᴘʟᴀʏʙᴀᴄᴋ ʀᴇsᴜᴍᴇᴅ.</b>\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    PAUSED = f"{EmojiTag.PAUSE} <b>ᴘʟᴀʏʙᴀᴄᴋ ᴘᴀᴜsᴇᴅ.</b>\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    AUTO_LEAVE_EMPTY = f"{EmojiTag.WARNING} <b>ɴᴏ ʟɪsᴛᴇɴᴇʀs ᴅᴇᴛᴇᴄᴛᴇᴅ. ʟᴇᴀᴠɪɴɢ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ.</b>"
+    AUTO_LEAVE_ONE = f"{EmojiTag.WARNING} <b>ᴏɴʟʏ ᴏɴᴇ ʟɪsᴛᴇɴᴇʀ ʀᴇᴍᴀɪɴᴇᴅ. ᴀssɪsᴛᴀɴᴛ ʟᴇꜰᴛ ᴄʜᴀᴛ.</b>"
+    ERROR_STREAM = f"{EmojiTag.ERROR} <b>ᴄᴏᴜʟᴅ ɴᴏᴛ ꜰɪɴᴅ ᴀ ᴠᴀʟɪᴅ sᴛʀᴇᴀᴍ sᴏᴜʀᴄᴇ.</b>"
+
+    # ── Autoplay & Suggestions ─────────────────────────────────────────────
+    SUGGESTION_CARD = (
+        f"{EmojiTag.MUSIC_NOTES} <b>ǫᴜᴇᴜᴇ ᴇɴᴅᴇᴅ • ʀᴇʟᴀᴛᴇᴅ sᴜɢɢᴇsᴛɪᴏɴs</b>\n\n"
+        "⏳ <i>ᴀᴜᴛᴏᴘʟᴀʏɪɴɢ #1 ɪɴ <b>{1}</b>s…</i>\n\n"
+        "{0}\n\n"
+        f"{EmojiTag.INFO} <i>ᴛᴀᴘ ᴀɴʏ sᴏɴɢ ᴛɪᴛʟᴇ ᴛᴏ ᴘʟᴀʏ ɪᴍᴍᴇᴅɪᴀᴛᴇʟʏ.</i>"
+    )
+    SUGGESTION_CARD_NO_AUTOPLAY = (
+        f"{EmojiTag.MUSIC_NOTES} <b>ǫᴜᴇᴜᴇ ᴇɴᴅᴇᴅ • ʀᴇʟᴀᴛᴇᴅ sᴜɢɢᴇsᴛɪᴏɴs</b>\n\n"
+        "<i>ᴄʜᴏᴏsᴇ ᴀ sᴏɴɢ ᴛᴏ ᴘʟᴀʏ ɴᴇxᴛ:</i>\n\n"
+        "{0}\n\n"
+        f"{EmojiTag.INFO} <i>ᴛᴀᴘ ᴀɴʏ sᴏɴɢ ᴛɪᴛʟᴇ ᴛᴏ ᴘʟᴀʏ ɪᴍᴍᴇᴅɪᴀᴛᴇʟʏ.</i>"
+    )
+    AUTOPLAY_ENABLED = f"{EmojiTag.SUCCESS} <b>ᴀᴜᴛᴏᴘʟᴀʏ ᴇɴᴀʙʟᴇᴅ ꜰᴏʀ ᴛʜɪs ᴄʜᴀᴛ.</b>"
+    AUTOPLAY_DISABLED = f"{EmojiTag.WARNING} <b>ᴀᴜᴛᴏᴘʟᴀʏ ᴅɪsᴀʙʟᴇᴅ ꜰᴏʀ ᴛʜɪs ᴄʜᴀᴛ.</b>"
+    AUTOPLAY_STATUS = f"{EmojiTag.INFO} <b>ᴀᴜᴛᴏᴘʟᴀʏ sᴛᴀᴛᴜs:</b> {{}}"
+    AUTOPLAY_USAGE = f"{EmojiTag.INFO} <b>ᴜsᴀɢᴇ:</b> <code>/autoplay [on|off]</code>\n‣ <b>ᴄᴜʀʀᴇɴᴛ sᴛᴀᴛᴜs:</b> {{}}"
+    AUTOPLAY_ADMIN_ONLY_SWITCH = f"{EmojiTag.INFO} <b>ᴀᴜᴛᴏᴘʟᴀʏ sᴛᴀᴛᴜs:</b> {{}}\n<i>(Only admins & auth users can switch this setting)</i>"
+    AUTOPLAYING_TITLE = "▶️ <b>ᴀᴜᴛᴏᴘʟᴀʏɪɴɢ:</b> <b>{}</b>…"
+    STARTING_PLAYBACK = "▶️ Starting playback…"
+    PLAYING_SUGGESTION = "▶️ <b>ᴘʟᴀʏɪɴɢ sᴜɢɢᴇsᴛɪᴏɴ:</b> <code>{}</code>…"
+
+    # ── Controls Notices & Actions ─────────────────────────────────────────
+    SEEKED = f"{EmojiTag.SUCCESS} <b>sᴇᴇᴋᴇᴅ ᴛᴏ {{}}!</b>\n\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    QUEUE_CLEARED_STOPPED = f"<b>{EmojiTag.STOP} ǫᴜᴇᴜᴇ ᴄʟᴇᴀʀᴇᴅ</b>\n<b>‣ sᴛʀᴇᴀᴍɪɴɢ sᴛᴏᴘᴘᴇᴅ</b>\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    SONG_LOOPED = f"<b>{EmojiTag.LOOP} ᴄᴜʀʀᴇɴᴛ sᴏɴɢ ᴡɪʟʟ ʙᴇ ʀᴇᴘᴇᴀᴛᴇᴅ {{}} ᴛɪᴍᴇs!</b>\n\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    SONG_RESUMED_NOTICE = f"<b>{EmojiTag.RESUME} sᴏɴɢ ʀᴇsᴜᴍᴇᴅ.</b>\n\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    SONG_PAUSED_NOTICE = f"<b>{EmojiTag.PAUSE} sᴏɴɢ ᴘᴀᴜsᴇᴅ.</b>\n\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+
+    # ── Admin & Auth ───────────────────────────────────────────────────────
+    ADMIN_UNKNOWN_USER = f"{EmojiTag.WARNING} <b>ᴄᴀɴɴᴏᴛ ᴠᴇʀɪꜰʏ ᴀᴅᴍɪɴ sᴛᴀᴛᴜs ꜰᴏʀ ᴛʜɪs ᴜsᴇʀ.</b>"
+    ADMIN_RESTRICTED_ACTION = f"{EmojiTag.LOCK} <b>ᴛʜɪs ᴀᴄᴛɪᴏɴ ɪs ʀᴇsᴛʀɪᴄᴛᴇᴅ ᴛᴏ ᴀᴅᴍɪɴs ᴏɴʟʏ.</b>"
+    ADMIN_RESTRICTED_CMD = f"{EmojiTag.LOCK} <b>ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ɪs ʀᴇsᴛʀɪᴄᴛᴇᴅ ᴛᴏ ᴀᴅᴍɪɴs ᴏɴʟʏ.</b>"
+    AUTH_FAILED = f"{EmojiTag.ERROR} <b>ᴀᴜᴛʜᴏʀɪᴢᴀᴛɪᴏɴ ᴄʜᴇᴄᴋ ꜰᴀɪʟᴇᴅ.</b>"
+
+    # ── Seek & Loop ────────────────────────────────────────────────────────
+    SEEK_NO_ARGS = f"{EmojiTag.INFO} <b>ᴘʀᴏᴠɪᴅᴇ sᴇᴇᴋ ᴛɪᴍᴇ ɪɴ sᴇᴄᴏɴᴅs.</b>\n<b>‣ ᴜsᴀɢᴇ:</b> <code>/seek &lt;seconds&gt;</code>"
+    SEEK_NEGATIVE = f"{EmojiTag.ERROR} <b>sᴇᴇᴋ ᴛɪᴍᴇ ᴄᴀɴɴᴏᴛ ʙᴇ ɴᴇɢᴀᴛɪᴠᴇ.</b>"
+    SEEK_INVALID = f"{EmojiTag.ERROR} <b>ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ ɴᴜᴍʙᴇʀ ᴏꜰ sᴇᴄᴏɴᴅs.</b>"
+    SEEK_BEYOND_REMAINING = f"{EmojiTag.WARNING} <b>ᴄᴀɴɴᴏᴛ sᴇᴇᴋ ʙᴇʏᴏɴᴅ ʀᴇᴍᴀɪɴɪɴɢ ᴅᴜʀᴀᴛɪᴏɴ.</b>"
+    SEEK_BEYOND_PLAYED = f"{EmojiTag.WARNING} <b>ᴄᴀɴɴᴏᴛ sᴇᴇᴋ ʙᴀᴄᴋ ᴍᴏʀᴇ ᴛʜᴀɴ ᴀʟʀᴇᴀᴅʏ ᴘʟᴀʏᴇᴅ ᴅᴜʀᴀᴛɪᴏɴ.</b>"
+
+    LOOP_NO_ARGS = f"{EmojiTag.INFO} <b>ᴘʀᴏᴠɪᴅᴇ ɴᴜᴍʙᴇʀ ᴏꜰ ʟᴏᴏᴘs.</b>\n<b>‣ ᴜsᴀɢᴇ:</b> <code>/loop &lt;1-20&gt;</code>"
+    LOOP_OUT_OF_BOUNDS = f"{EmojiTag.WARNING} <b>ʟᴏᴏᴘ ᴄᴏᴜɴᴛ ᴍᴜsᴛ ʙᴇ ʙᴇᴛᴡᴇᴇɴ 1 ᴀɴᴅ 20.</b>"
+    LOOP_INVALID = f"{EmojiTag.ERROR} <b>ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ ʟᴏᴏᴘ ᴄᴏᴜɴᴛ.</b>"
+
+    # ── General Errors & Status ───────────────────────────────────────────
+    ERROR_OCCURRED = f"{EmojiTag.ERROR} <b>ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ. ᴘʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ.</b>"
+    ERROR_PERMISSIONS = f"{EmojiTag.ERROR} <b>ꜰᴀɪʟᴇᴅ ᴛᴏ ᴄʜᴇᴄᴋ ʙᴏᴛ ᴘᴇʀᴍɪssɪᴏɴs.</b>"
+    ERROR_USER_NOT_FOUND = f"{EmojiTag.ERROR} <b>ᴜsᴇʀ ɴᴏᴛ ꜰᴏᴜɴᴅ. ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ ᴜsᴇʀɴᴀᴍᴇ ᴏʀ ɪᴅ.</b>"
+
+    QUEUE_EMPTY = f"{EmojiTag.QUEUE_ICON} <b>ǫᴜᴇᴜᴇ ɪs ᴇᴍᴘᴛʏ.</b>"
+    NOTHING_TO_SHUFFLE = f"{EmojiTag.WARNING} <b>ɴᴇᴇᴅ ᴀᴛ ʟᴇᴀsᴛ 2 ᴛʀᴀᴄᴋs ɪɴ ǫᴜᴇᴜᴇ ᴛᴏ sʜᴜꜰꜰʟᴇ.</b>"
+    QUEUE_SHUFFLED = f"{EmojiTag.REFRESH} <b>sʜᴜꜰꜰʟᴇᴅ {{}} ᴜᴘᴄᴏᴍɪɴɢ ᴛʀᴀᴄᴋ(s).</b>"
+    PLAYLIST_QUEUED = f"{EmojiTag.ADD} <b>ᴀᴅᴅᴇᴅ {{}} ᴛʀᴀᴄᴋs ꜰʀᴏᴍ ᴘʟᴀʏʟɪsᴛ ᴛᴏ ǫᴜᴇᴜᴇ.</b>"
+    OWNER_SUDO_CMD = f"{EmojiTag.KEY} <b>ᴏᴡɴᴇʀ/sᴜᴅᴏ ᴏɴʟʏ ᴄᴏᴍᴍᴀɴᴅ.</b>"
+    NO_TAGALL = f"{EmojiTag.WARNING} <b>ɴᴏ ᴛᴀɢ-ᴀʟʟ sᴇssɪᴏɴ ꜰᴏᴜɴᴅ.</b>"
+    DISMISS_MENTION = f"{EmojiTag.SUCCESS} <b>ᴍᴇɴᴛɪᴏɴ ᴅɪsᴍɪssᴇᴅ.</b>"
+    ERROR_DEL_MSG = f"{EmojiTag.ERROR} <b>ᴇʀʀᴏʀ ᴅᴇʟᴇᴛɪɴɢ ᴍᴇssᴀɢᴇ.</b>"
+    REPLY_TO_DEL = f"{EmojiTag.INFO} <b>ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ ᴅᴇʟᴇᴛᴇ ɪᴛ.</b>"
+    OWNER_AUTH_ALL = f"{EmojiTag.CROWN} <b>ᴏᴡɴᴇʀ ɪs ᴀʟʀᴇᴀᴅʏ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴇᴠᴇʀʏᴡʜᴇʀᴇ.</b>"
+    USER_AUTH = f"{EmojiTag.SUCCESS} <b>ᴜsᴇʀ {{}} ʜᴀs ʙᴇᴇɴ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ɪɴ ᴛʜɪs ᴄʜᴀᴛ.</b>"
+    USER_ALREADY_AUTH = f"{EmojiTag.INFO} <b>ᴜsᴇʀ {{}} ɪs ᴀʟʀᴇᴀᴅʏ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ɪɴ ᴛʜɪs ᴄʜᴀᴛ.</b>"
+    CANT_AUTH_SELF = f"{EmojiTag.WARNING} <b>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ᴀᴜᴛʜᴏʀɪᴢᴇ ʏᴏᴜʀsᴇʟꜰ ᴏʀ ᴀɴᴏɴʏᴍᴏᴜs ᴜsᴇʀs.</b>"
+    NOT_FROM_USER = f"{EmojiTag.WARNING} <b>ᴛʜᴇ ʀᴇᴘʟɪᴇᴅ ᴍᴇssᴀɢᴇ ɪs ɴᴏᴛ ꜰʀᴏᴍ ᴀ ᴜsᴇʀ.</b>"
+    INVALID_USER_ID = f"{EmojiTag.ERROR} <b>ᴘʀᴏᴠɪᴅᴇ ᴀ ᴠᴀʟɪᴅ ɴᴜᴍᴇʀɪᴄ ᴜsᴇʀ ɪᴅ.</b>"
+    REPLY_OR_PROVIDE_ID = f"{EmojiTag.INFO} <b>ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴜsᴇʀ ᴏʀ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴜsᴇʀ ɪᴅ.</b>"
+    OWNER_BLOCK_RESTRICT = f"{EmojiTag.WARNING} <b>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʙʟᴏᴄᴋ ᴛʜᴇ ᴏᴡɴᴇʀ.</b>"
+    CANT_REMOVE_AUTH_OWNER = f"{EmojiTag.WARNING} <b>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʀᴇᴍᴏᴠᴇ ᴀᴜᴛʜᴏʀɪᴢᴀᴛɪᴏɴ ꜰʀᴏᴍ ᴏᴡɴᴇʀ.</b>"
+    USER_REMOVED_AUTH = f"{EmojiTag.SUCCESS} <b>ᴜsᴇʀ {{}} ʜᴀs ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ꜰʀᴏᴍ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ᴜsᴇʀs.</b>"
+    USER_NOT_AUTH = f"{EmojiTag.WARNING} <b>ᴜsᴇʀ {{}} ɪs ɴᴏᴛ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ ɪɴ ᴛʜɪs ᴄʜᴀᴛ.</b>"
+    USER_BLOCKED = f"{EmojiTag.BLOCKED} <b>ᴜsᴇʀ {{}} ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ ᴛᴏ ʙʟᴏᴄᴋʟɪsᴛ.</b>"
+    USER_ALREADY_BLOCKED = f"{EmojiTag.INFO} <b>ᴜsᴇʀ {{}} ɪs ᴀʟʀᴇᴀᴅʏ ɪɴ ʙʟᴏᴄᴋʟɪsᴛ.</b>"
+    CANT_BLOCK_SELF = f"{EmojiTag.WARNING} <b>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʙʟᴏᴄᴋ ʏᴏᴜʀsᴇʟꜰ ᴏʀ ᴀɴᴏɴʏᴍᴏᴜs ᴜsᴇʀs.</b>"
+    REBOOTING = f"{EmojiTag.REFRESH} <b>ʀᴇʙᴏᴏᴛɪɴɢ ʙᴏᴛ ᴘʀᴏᴄᴇss...</b>"
+    REMOVED_FROM_BLOCKLIST = f"{EmojiTag.SUCCESS} <b>ᴜsᴇʀ {{}} ʜᴀs ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ꜰʀᴏᴍ ʙʟᴏᴄᴋʟɪsᴛ.</b>"
+    NOT_IN_BLOCKLIST = f"{EmojiTag.INFO} <b>ᴜsᴇʀ {{}} ɪs ɴᴏᴛ ɪɴ ʙʟᴏᴄᴋʟɪsᴛ.</b>"
+
+    LOADING = f"{EmojiTag.LOADING} <b>ʟᴏᴀᴅɪɴɢ...</b>"
+    GETTING_STREAM_INFO = f"{EmojiTag.LOADING} <b>ꜰᴇᴛᴄʜɪɴɢ sᴛʀᴇᴀᴍ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...</b>"
+    GETTING_CHATS = f"{EmojiTag.LOADING} <b>ꜰᴇᴛᴄʜɪɴɢ ᴄʜᴀᴛs, ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...</b>"
+    BOLT = f"{EmojiTag.BOLT} <b>ᴘʀᴏᴄᴇssɪɴɢ...</b>"
+
+    # ── Broadcast ─────────────────────────────────────────────────────────
+    START_BOT_BROADCAST = f"{EmojiTag.BROADCAST} <b>sᴛᴀʀᴛɪɴɢ ʙʀᴏᴀᴅᴄᴀsᴛ ꜰʀᴏᴍ ʙᴏᴛ ᴀᴄᴄᴏᴜɴᴛ...</b>"
+    START_ASSISTANT_BROADCAST = f"{EmojiTag.BROADCAST} <b>sᴛᴀʀᴛɪɴɢ ʙʀᴏᴀᴅᴄᴀsᴛ ꜰʀᴏᴍ ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ...</b>"
+    REPLY_TO_BROADCAST = f"{EmojiTag.INFO} <b>ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴍᴇssᴀɢᴇ ᴛᴏ ʙʀᴏᴀᴅᴄᴀsᴛ ɪᴛ.</b>"
+    NO_MSG_FOR_BROADCAST = f"{EmojiTag.WARNING} <b>ɴᴏ ᴍᴇssᴀɢᴇ ᴀᴠᴀɪʟᴀʙʟᴇ ꜰᴏʀ ʙʀᴏᴀᴅᴄᴀsᴛ.</b>"
+    BROADCAST_SETTINGS = (
+        f"{EmojiTag.BROADCAST} <b>ʙʀᴏᴀᴅᴄᴀsᴛ sᴇᴛᴛɪɴɢs</b>\n\n"
+        "<b>‣ ɢʀᴏᴜᴘs:</b> {group}\n"
+        "<b>‣ ᴘʀɪᴠᴀᴛᴇ:</b> {private}\n"
+        "<b>‣ ᴜsᴇʀʙᴏᴛ ɢʀᴏᴜᴘs:</b> {ugroup}\n"
+        "<b>‣ ᴜsᴇʀʙᴏᴛ ᴘʀɪᴠᴀᴛᴇ:</b> {uprivate}\n"
+        "<b>‣ ʙᴏᴛ ʙʀᴏᴀᴅᴄᴀsᴛ:</b> {bot}\n"
+        "<b>‣ ᴜsᴇʀʙᴏᴛ ʙʀᴏᴀᴅᴄᴀsᴛ:</b> {userbot}\n"
+        "<b>‣ ᴘɪɴ ᴍᴇssᴀɢᴇs:</b> {pin}\n"
+        "<b>‣ ꜰᴏʀᴡᴀʀᴅ ᴍᴏᴅᴇ:</b> {forward}"
+    )
+    BROADCAST_PROGRESS = (
+        f"{EmojiTag.BROADCAST} <b>ʙʀᴏᴀᴅᴄᴀsᴛ ɪɴ ᴘʀᴏɢʀᴇss...</b>\n\n"
+        "<b>‣ sᴇɴᴛ:</b> <code>{sent}</code>\n"
+        "<b>‣ ᴜsᴇʀs:</b> <code>{users}</code>\n"
+        "<b>‣ ɢʀᴏᴜᴘs:</b> <code>{groups}</code>\n"
+        "<b>‣ ᴛᴏᴛᴀʟ ᴄʜᴀᴛs:</b> <code>{chats}</code>"
+    )
+    BROADCAST_COMPLETE = (
+        f"{EmojiTag.SUCCESS} <b>ʙʀᴏᴀᴅᴄᴀsᴛ ᴄᴏᴍᴘʟᴇᴛᴇᴅ!</b>\n\n"
+        "<b>‣ ᴛᴏᴛᴀʟ sᴇɴᴛ:</b> <code>{sent}</code>\n"
+        "<b>‣ ᴜsᴇʀs:</b> <code>{users}</code>\n"
+        "<b>‣ ɢʀᴏᴜᴘs:</b> <code>{groups}</code>"
+    )
+    ASSISTANT_BROADCAST_PROGRESS = (
+        f"{EmojiTag.BROADCAST} <b>ᴀssɪsᴛᴀɴᴛ ʙʀᴏᴀᴅᴄᴀsᴛ ɪɴ ᴘʀᴏɢʀᴇss...</b>\n\n"
+        "<b>‣ sᴇɴᴛ:</b> <code>{sent}</code>\n"
+        "<b>‣ ᴜsᴇʀs:</b> <code>{users}</code>\n"
+        "<b>‣ ɢʀᴏᴜᴘs:</b> <code>{groups}</code>"
+    )
+    ASSISTANT_BROADCAST_COMPLETE = (
+        f"{EmojiTag.SUCCESS} <b>ᴀssɪsᴛᴀɴᴛ ʙʀᴏᴀᴅᴄᴀsᴛ ᴄᴏᴍᴘʟᴇᴛᴇᴅ!</b>\n\n"
+        "<b>‣ ᴛᴏᴛᴀʟ sᴇɴᴛ:</b> <code>{sent}</code>\n"
+        "<b>‣ ᴜsᴇʀs:</b> <code>{users}</code>\n"
+        "<b>‣ ɢʀᴏᴜᴘs:</b> <code>{groups}</code>"
+    )
+
+    NO_BLOCKLIST = f"{EmojiTag.INFO} <b>ɴᴏ ʙʟᴏᴄᴋʟɪsᴛ ꜰᴏᴜɴᴅ.</b>"
+    NO_USERS_BLOCKED = f"{EmojiTag.INFO} <b>ɴᴏ ᴜsᴇʀs ᴀʀᴇ ᴄᴜʀʀᴇɴᴛʟʏ ʙʟᴏᴄᴋᴇᴅ.</b>"
+    GROUP_ONLY = f"{EmojiTag.WARNING} <b>ᴘʟᴀʏ ᴄᴏᴍᴍᴀɴᴅs ᴄᴀɴ ᴏɴʟʏ ʙᴇ ᴜsᴇᴅ ɪɴ ɢʀᴏᴜᴘs.</b>"
+    NO_LINKED_CHANNEL = f"{EmojiTag.WARNING} <b>ᴛʜɪs ɢʀᴏᴜᴘ ʜᴀs ɴᴏ ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ.</b>"
+    USER_DATA_NOT_FOUND = f"{EmojiTag.WARNING} <b>ᴜsᴇʀ ᴅᴀᴛᴀ ɴᴏᴛ ꜰᴏᴜɴᴅ.</b>"
+    NO_DATA_FOUND = f"{EmojiTag.WARNING} <b>ɴᴏ ᴅᴀᴛᴀ ꜰᴏᴜɴᴅ.</b>"
+
+    COLLECTING_STATS = f"{EmojiTag.STATS} <b>ᴄᴏʟʟᴇᴄᴛɪɴɢ sᴛᴀᴛs...</b>"
+    PINGING = f"{EmojiTag.PING} <b>ᴘɪɴɢɪɴɢ...</b>"
+
+    NO_PERM_END_SESSION = f"{EmojiTag.LOCK} <b>ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴇɴᴅ sᴇssɪᴏɴ.</b>"
+    NO_PERM_SKIP = f"{EmojiTag.LOCK} <b>ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ sᴋɪᴘ.</b>"
+    NO_PERM_RESUME = f"{EmojiTag.LOCK} <b>ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ʀᴇsᴜᴍᴇ.</b>"
+    NO_PERM_PAUSE = f"{EmojiTag.LOCK} <b>ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴘᴀᴜsᴇ.</b>"
+    BOT_OWNER_ONLY = f"{EmojiTag.OWNER} <b>ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ɪs ᴀᴠᴀɪʟᴀʙʟᴇ ᴛᴏ ʙᴏᴛ ᴏᴡɴᴇʀ ᴏɴʟʏ.</b>"
+
+    STREAM_ENDED = f"{EmojiTag.SUCCESS} <b>sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ sᴜᴄᴄᴇssꜰᴜʟʟʏ.</b>"
+    STREAM_ENDED_NOT_IN_CALL = f"{EmojiTag.INFO} <b>sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ (ᴀssɪsᴛᴀɴᴛ ᴡᴀs ɴᴏᴛ ɪɴ ᴄᴀʟʟ).</b>"
+    ASSISTANT_NOT_STREAMING = f"{EmojiTag.INFO} <b>ᴀssɪsᴛᴀɴᴛ ɪs ɴᴏᴛ sᴛʀᴇᴀᴍɪɴɢ ᴀɴʏᴛʜɪɴɢ.</b>"
+    NO_ACTIVE_STREAM = f"{EmojiTag.ERROR} <b>ɴᴏ ᴀᴄᴛɪᴠᴇ sᴛʀᴇᴀᴍ ꜰᴏᴜɴᴅ.</b>"
+    SKIPPED_SUCCESS = f"{EmojiTag.SUCCESS} <b>sᴋɪᴘᴘᴇᴅ ᴛᴏ ɴᴇxᴛ ᴛʀᴀᴄᴋ.</b>"
+    PLAYING_NOW = f"{EmojiTag.PLAY} <b>ᴊᴜᴍᴘɪɴɢ ᴛᴏ ᴛʜɪs ᴛʀᴀᴄᴋ...</b>\n<b>‣ ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ:</b> {{}}"
+    TRACK_GONE = f"{EmojiTag.INFO} <b>ᴛʜɪs ᴛʀᴀᴄᴋ ɪs ɴᴏ ʟᴏɴɢᴇʀ ɪɴ ᴛʜᴇ ǫᴜᴇᴜᴇ.</b>"
+    QUEUE_EMPTY_STREAM_ENDED = f"{EmojiTag.QUEUE_ICON} <b>ǫᴜᴇᴜᴇ ᴇɴᴅᴇᴅ. sᴛʀᴇᴀᴍ sᴛᴏᴘᴘᴇᴅ.</b>"
+
+    USE_COMMAND_AS_USER = f"{EmojiTag.WARNING} <b>ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴀs ᴀ ᴜsᴇʀ ᴀᴄᴄᴏᴜɴᴛ.</b>"
+    STICKER_LONG = f"{EmojiTag.INFO} <b>sᴛɪᴄᴋᴇʀ ᴘʀᴏᴄᴇssɪɴɢ ᴍᴀʏ ᴛᴀᴋᴇ ʟᴏɴɢᴇʀ ꜰᴏʀ ʟᴀʀɢᴇ ᴘᴀᴄᴋs.</b>"
+    REPLY_TO_PHOTO_OR_STICKER = f"{EmojiTag.INFO} <b>ʀᴇᴘʟʏ ᴛᴏ ᴀ ᴘʜᴏᴛᴏ ᴏʀ sᴛɪᴄᴋᴇʀ.</b>"
+    PROCESSING = f"{EmojiTag.LOADING} <b>ᴘʀᴏᴄᴇssɪɴɢ...</b>"
+    ONLY_MEDIA_ALLOWED = f"{EmojiTag.WARNING} <b>ᴏɴʟʏ ᴘʜᴏᴛᴏs, ᴠɪᴅᴇᴏs, ɢɪꜰs, ᴀɴᴅ sᴛɪᴄᴋᴇʀs ᴀʀᴇ ᴀʟʟᴏᴡᴇᴅ.</b>"
+    MEDIA_SIZE_EXCEED = f"{EmojiTag.WARNING} <b>ᴍᴇᴅɪᴀ sɪᴢᴇ ᴍᴜsᴛ ʙᴇ ʙᴇʟᴏᴡ 5 ᴍʙ.</b>"
+    ERROR_MEDIA_PROCESS = f"{EmojiTag.ERROR} <b>ᴇʀʀᴏʀ ᴘʀᴏᴄᴇssɪɴɢ ᴍᴇᴅɪᴀ. ᴘʟᴇᴀsᴇ ᴛʀʏ ᴀ ᴅɪꜰꜰᴇʀᴇɴᴛ ꜰɪʟᴇ.</b>"
+    NOTHING_TO_UPDATE = f"{EmojiTag.INFO} <b>ɴᴏᴛʜɪɴɢ ᴛᴏ ᴜᴘᴅᴀᴛᴇ.</b>"
+    WELCOME_TOO_LONG = f"{EmojiTag.WARNING} <b>ᴡᴇʟᴄᴏᴍᴇ ᴍᴇssᴀɢᴇ ɪs ᴛᴏᴏ ʟᴏɴɢ. ᴍᴀx 4096 ᴄʜᴀʀᴀᴄᴛᴇʀs.</b>"
+    WELCOME_RESET = f"{EmojiTag.SUCCESS} <b>ᴡᴇʟᴄᴏᴍᴇ ᴍᴇssᴀɢᴇ ᴀɴᴅ ʟᴏɢᴏ ʜᴀᴠᴇ ʙᴇᴇɴ ʀᴇsᴇᴛ.</b>"
+
+    UNSUPPORTED_MEDIA = f"{EmojiTag.WARNING} <b>ᴜɴsᴜᴘᴘᴏʀᴛᴇᴅ ᴍᴇᴅɪᴀ ᴛʏᴘᴇ.</b>"
+    FILE_TOO_LARGE = f"{EmojiTag.WARNING} <b>ꜰɪʟᴇ sɪᴢᴇ ᴇxᴄᴇᴇᴅs ᴛʜᴇ 2 ɢʙ ʟɪᴍɪᴛ.</b>"
+    NO_QUERY_MATCH = f"{EmojiTag.ERROR} <b>ɴᴏ ᴍᴀᴛᴄʜɪɴɢ ʀᴇsᴜʟᴛ ꜰᴏᴜɴᴅ. ᴛʀʏ ᴀɴᴏᴛʜᴇʀ ǫᴜᴇʀʏ.</b>"
+    NO_QUERY_GIVEN = f"{EmojiTag.INFO} <b>ɴᴏ ǫᴜᴇʀʏ ᴘʀᴏᴠɪᴅᴇᴅ.</b>"
+    NEED_INVITE_PERMISSION = f"{EmojiTag.LOCK} <b>ɪ ɴᴇᴇᴅ 'ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ' ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴊᴏɪɴ.</b>"
+    NEED_INVITE_PERMISSION_CHANNEL = (
+        f"{EmojiTag.LOCK} <b>ɪ ɴᴇᴇᴅ ᴀᴅᴍɪɴ ʀɪɢʜᴛs ᴡɪᴛʜ 'ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ' ɪɴ ᴛʜᴇ ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ:</b>\n"
+        f"‣ <b>ᴄʜᴀɴɴᴇʟ:</b> <code>{{}}</code>"
+    )
+    ASSISTANT_BANNED_CHANNEL = (
+        f"{EmojiTag.LOCK} <b>ᴀssɪsᴛᴀɴᴛ ɪs ʙᴀɴɴᴇᴅ ɪɴ ᴛʜᴇ ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ.</b>\n\n"
+        f"<b>‣ ᴄʜᴀɴɴᴇʟ:</b> <code>{{0}}</code>\n"
+        f"<b>‣ ᴘʟᴇᴀsᴇ ᴜɴʙᴀɴ:</b> {{1}}\n"
+        f"<b>‣ ᴜsᴇʀ ɪᴅ:</b> <code>{{2}}</code>"
+    )
+    FAILED_JOIN_CHANNEL = (
+        f"{EmojiTag.ERROR} <b>ꜰᴀɪʟᴇᴅ ᴛᴏ ᴊᴏɪɴ ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ:</b> <code>{{}}</code>\n"
+        f"<i>ᴘʟᴇᴀsᴇ ᴇɴsᴜʀᴇ ᴛʜᴇ ʙᴏᴛ ᴀɴᴅ ᴀssɪsᴛᴀɴᴛ ᴀʀᴇ ᴀᴅᴅᴇᴅ ᴛᴏ ᴛʜᴇ ᴄʜᴀɴɴᴇʟ ᴀs ᴀᴅᴍɪɴɪsᴛʀᴀᴛᴏʀs.</i>"
+    )
+    LINKED_CHANNEL_ERROR = f"{EmojiTag.ERROR} <b>ꜰᴀɪʟᴇᴅ ᴛᴏ ᴀᴄᴄᴇss ʟɪɴᴋᴇᴅ ᴄʜᴀɴɴᴇʟ.</b>"
+    NO_OPERATIONAL_DATA = f"{EmojiTag.INFO} <b>ɴᴏ ᴏᴘᴇʀᴀᴛɪᴏɴᴀʟ ᴅᴀᴛᴀ ꜰᴏᴜɴᴅ ꜰᴏʀ ᴛʜɪs ʙᴏᴛ.</b>"
+
+    STICKER_NO_NAME = f"{EmojiTag.WARNING} <b>sᴛɪᴄᴋᴇʀ ʜᴀs ɴᴏ ᴠᴀʟɪᴅ ɴᴀᴍᴇ.</b>"
+    STICKER_DOWNLOAD_FAILED = f"{EmojiTag.ERROR} <b>ғᴀɪʟᴇᴅ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ sᴛɪᴄᴋᴇʀ.**\n<i>ᴘʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ᴏʀ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ɴᴇᴛᴡᴏʀᴋ ᴄᴏɴɴᴇᴄᴛɪᴏɴ.</i>"
+    UNSUPPORTED_FILE = f"{EmojiTag.WARNING} <b>ᴜɴsᴜᴘᴘᴏʀᴛᴇᴅ ꜰɪʟᴇ ᴛʏᴘᴇ.</b>"
+    REPLY_TO_MEDIA = f"{EmojiTag.INFO} <b>ʀᴇᴘʟʏ ᴛᴏ ᴘʜᴏᴛᴏ/ɢɪꜰ/sᴛɪᴄᴋᴇʀ ᴍᴇᴅɪᴀ ꜰɪʀsᴛ.</b>"
+    CREATING_STICKER_PACK = f"{EmojiTag.KANG} <b>ᴄʀᴇᴀᴛɪɴɢ ᴀ ɴᴇᴡ sᴛɪᴄᴋᴇʀ ᴘᴀᴄᴋ...</b>"
+
+    PAID_OWNER_CMD = f"{EmojiTag.OWNER} <b>ᴘᴀɪᴅ ᴏᴡɴᴇʀ ᴏɴʟʏ ᴄᴏᴍᴍᴀɴᴅ.</b>"
+    NO_SUDO_USERS = f"{EmojiTag.INFO} <b>ɴᴏ sᴜᴅᴏ ᴜsᴇʀs ꜰᴏᴜɴᴅ.</b>"
+    ERR_FETCH_SUDO = f"{EmojiTag.ERROR} <b>ᴇʀʀᴏʀ ᴡʜɪʟᴇ ꜰᴇᴛᴄʜɪɴɢ sᴜᴅᴏ ʟɪsᴛ.</b>"
+    ERR_SUDO_WRITE = f"{EmojiTag.ERROR} <b>ᴄᴏᴜʟᴅ ɴᴏᴛ sᴀᴠᴇ ᴛʜᴇ sᴜᴅᴏ ᴄʜᴀɴɢᴇ — ɴᴏᴛʜɪɴɢ ᴡᴀs ᴀᴘᴘʟɪᴇᴅ.</b>"
+    RATE_LIMITED = f"{EmojiTag.WARNING} <b>ʏᴏᴜ'ʀᴇ sᴇɴᴅɪɴɢ ᴘʟᴀʏ ᴄᴏᴍᴍᴀɴᴅs ᴛᴏᴏ ꜰᴀsᴛ.</b>"
+    OWNER_CMD = f"{EmojiTag.OWNER} <b>ᴏᴡɴᴇʀ ᴏɴʟʏ ᴄᴏᴍᴍᴀɴᴅ.</b>"
+    ALREADY_OWNER = f"{EmojiTag.INFO} <b>ᴛʜɪs ᴜsᴇʀ ɪs ᴀʟʀᴇᴀᴅʏ ᴏᴡɴᴇʀ.</b>"
+    USER_ADDED_SUDO = f"{EmojiTag.SUCCESS} <b>ᴜsᴇʀ {{}} ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ ᴛᴏ sᴜᴅᴏᴇʀs.</b>"
+    USER_ALREADY_SUDO = f"{EmojiTag.INFO} <b>ᴜsᴇʀ {{}} ɪs ᴀʟʀᴇᴀᴅʏ ɪɴ sᴜᴅᴏᴇʀs.</b>"
+    CANT_SUDO_SELF = f"{EmojiTag.WARNING} <b>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ᴀᴅᴅ ʏᴏᴜʀsᴇʟꜰ ᴏʀ ʙᴏᴛ ᴛᴏ sᴜᴅᴏᴇʀs.</b>"
+    CANT_REMOVE_OWNER_SUDO = f"{EmojiTag.WARNING} <b>ᴄᴀɴɴᴏᴛ ʀᴇᴍᴏᴠᴇ ᴏᴡɴᴇʀ ꜰʀᴏᴍ sᴜᴅᴏ ʟɪsᴛ.</b>"
+    USER_NOT_IN_DB = f"{EmojiTag.WARNING} <b>ᴜsᴇʀ {{}} ɪs ɴᴏᴛ ɪɴ ᴅᴀᴛᴀʙᴀsᴇ.</b>"
+    USER_REMOVED_SUDO = f"{EmojiTag.SUCCESS} <b>ᴜsᴇʀ {{}} ʜᴀs ʙᴇᴇɴ ʀᴇᴍᴏᴠᴇᴅ ꜰʀᴏᴍ sᴜᴅᴏᴇʀs.</b>"
+    USER_NOT_IN_SUDO = f"{EmojiTag.WARNING} <b>ᴜsᴇʀ {{}} ɪs ɴᴏᴛ ɪɴ sᴜᴅᴏᴇʀs.</b>"
+    CANT_REMOVE_SELF_SUDO = f"{EmojiTag.WARNING} <b>ʏᴏᴜ ᴄᴀɴɴᴏᴛ ʀᴇᴍᴏᴠᴇ ʏᴏᴜʀsᴇʟꜰ ꜰʀᴏᴍ sᴜᴅᴏᴇʀs.</b>"
+
+    # ── Additional Catalog Strings ─────────────────────────────────────────
+    CALL_CLIENT_NOT_READY = f"<b>{EmojiTag.ERROR} ᴄᴀʟʟ ᴄʟɪᴇɴᴛ ɴᴏᴛ ʀᴇᴀᴅʏ.</b>"
+    ASSISTANT_BANNED = "Assistant is banned in this chat.\n\nPlease unban {}\nuser id: {}"
+    FAILED_JOIN_GROUP = "Failed to join the group. Please try again."
+    MMF_USAGE = "Please use `/mmf <text>`"
+    MMF_DOWNLOAD_FAILED = "Failed to download media for memify."
+    INVALID_FONT_SELECTION = "Invalid font style selection."
+    HELP_CATEGORY_SELECT = f"<u><b>{EmojiTag.INFO} | sᴇʟᴇᴄᴛ ᴀ ᴄᴏᴍᴍᴀɴᴅ ᴄᴀᴛᴇɢᴏʀʏ</b></u>"
+    DEFAULT_START_MESSAGE = (
+        f"{EmojiTag.USER} <b>ʜᴇʏ {{name}}!</b>\n\n"
+        f"{EmojiTag.MUSIC_NOTE} <b>ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ {{botname}}</b>\n"
+        f"<i>ʏᴏᴜʀ ᴜʟᴛɪᴍᴀᴛᴇ ʜɪɢʜ-ǫᴜᴀʟɪᴛʏ ᴍᴜsɪᴄ &amp; ᴠɪᴅᴇᴏ sᴛʀᴇᴀᴍɪɴɢ ʙᴏᴛ ꜰᴏʀ ᴛᴇʟᴇɢʀᴀᴍ!</i>\n\n"
+        f"✨ <b><u>sᴘᴇᴄɪᴀʟ ꜰᴇᴀᴛᴜʀᴇs</u></b> ✨\n\n"
+        f"• {EmojiTag.HEADPHONES} <b>ᴜʟᴛʀᴀ-ʜᴅ sᴛʀᴇᴀᴍɪɴɢ:</b> <i>ᴄʀʏsᴛᴀʟ-ᴄʟᴇᴀʀ ᴀᴜᴅɪᴏ &amp; ᴠɪᴅᴇᴏ in ɢʀᴏᴜᴘs &amp; ᴄʜᴀɴɴᴇʟs.</i>\n"
+        f"• {EmojiTag.ROCKET} <b>sᴍᴀʀᴛ ᴀᴜᴛᴏᴘʟᴀʏ (<code>/autoplay</code>):</b> <i>ᴀᴜᴛᴏ-ᴘʟᴀʏs ʀᴇʟᴀᴛᴇᴅ sᴏɴɢs sᴏ ᴍᴜsɪᴄ ɴᴇᴠᴇʀ sᴛᴏᴘs.</i>\n"
+        f"• {EmojiTag.BOLT} <b>ᴍᴜʟᴛɪ-ᴀssɪsᴛᴀɴᴛ:</b> <i>sᴇᴀᴍʟᴇss ʟᴏᴀᴅ-ʙᴀʟᴀɴᴄɪɴɢ ᴀᴄʀᴏss ᴍᴜʟᴛɪᴘʟᴇ ᴀssɪsᴛᴀɴᴛs.</i>\n"
+        f"• {EmojiTag.SETTINGS} <b>ᴀᴅᴠᴀɴᴄᴇᴅ ᴄᴏɴᴛʀᴏʟs:</b> <i>sᴇᴇᴋ (<code>/seek</code>), ʟᴏᴏᴘ (<code>/loop</code>), ꩖ᴏʀᴄᴇ-ᴘʟᴀʏ &amp; sʜᴜꜰꜰʟᴇ.</i>\n"
+        f"• {EmojiTag.TOOLS} <b>ꜰᴜɴ &amp; ᴜᴛɪʟɪᴛɪᴇs:</b> <i>sᴛɪᴄᴋᴇʀ ᴄʟᴏɴɪɴɢ (<code>/kang</code>), ᴍᴇᴍᴇs (<code>/mmf</code>) &amp; ᴛᴀɢᴀʟʟ.</i>\n\n"
+        f"<b><i>👇 ᴜsᴇ ᴛʜᴇ ʙᴜᴛᴛᴏɴs ʙᴇʟᴏᴡ ᴛᴏ ᴇxᴘʟᴏʀᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs!</i></b>"
+    )
+    GROUP_WELCOME = (
+        f"{EmojiTag.MUSIC_NOTE} <b>ʜᴇʏ {{adder}}!</b> ᴛʜᴀɴᴋs ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ ᴛᴏ <b>{{group_name}}</b> 🎉\n\n"
+        f"ɪ'ᴍ <b>{{botname}}</b> — ʏᴏᴜʀ ᴅᴇᴅɪᴄᴀᴛᴇᴅ ᴍᴜsɪᴄ ʙᴏᴛ.\n\n"
+        f"{EmojiTag.MUSIC_NOTES} ᴄʀʏsᴛᴀʟ-ᴄʟᴇᴀʀ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ sᴛʀᴇᴀᴍɪɴɢ\n"
+        f"{EmojiTag.BOLT} ʙʟᴀᴢɪɴɢ-ꜰᴀsᴛ ᴘʟᴀʏʙᴀᴄᴋ ᴡɪᴛʜ ǫᴜᴇᴜᴇ\n"
+        f"{EmojiTag.ROCKET} sᴍᴀʀᴛ ᴀᴜᴛᴏᴘʟᴀʏ &amp; sᴜɢɢᴇsᴛɪᴏɴs (<code>/autoplay</code>)\n"
+        f"{EmojiTag.GLOBE} ʏᴏᴜᴛᴜʙᴇ, sᴘᴏᴛɪꜰʏ &amp; ᴍᴏʀᴇ\n\n"
+        f"<i>ᴜsᴇ <code>/play [song]</code> ᴛᴏ ɢᴇᴛ sᴛᴀʀᴛᴇᴅ!</i>"
+    )
+
+    # ── Playlist Messages ───────────────────────────────────────────────────
+    PLAYLIST_SELECT_PROMPT = (
+        f"{EmojiTag.MUSIC_NOTES} <b>ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ</b><br/><br/>"
+        "<b>‣ ᴛʀᴀᴄᴋ:</b> <b>{0}</b><br/><br/>"
+        "<i>ᴄʜᴏᴏsᴇ ᴀ ᴘʟᴀʏʟɪsᴛ ʙᴇʟᴏᴡ ᴛᴏ sᴀᴠᴇ ᴛʜɪs sᴏɴɢ:</i>"
+    )
+    PLAYLIST_NO_PLAYLISTS_PROMPT = (
+        f"{EmojiTag.MUSIC_NOTES} <b>ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ</b><br/><br/>"
+        "<b>‣ ᴛʀᴀᴄᴋ:</b> <b>{0}</b><br/><br/>"
+        f"{EmojiTag.INFO} <i>ʏᴏᴜ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴀɴʏ ᴘʟᴀʏʟɪsᴛs ʏᴇᴛ. ᴛᴀᴘ ʙᴇʟᴏᴡ ᴛᴏ ᴄʀᴇᴀᴛᴇ ᴏɴᴇ:</i>"
+    )
+    PLAYLIST_ADDED_SUCCESS = "✅ Added '{}' to '{}'!"
+    PLAYLIST_TRACK_EXISTS = "⚠️ This song is already in '{}'!"
+    PLAYLIST_MAX_TRACKS = "❌ '{}' has reached the limit of 50 tracks!"
+    PLAYLIST_MAX_REACHED = f"{EmojiTag.WARNING} <b>ʏᴏᴜ ʜᴀᴠᴇ ʀᴇᴀᴄʜᴇᴅ ᴛʜᴇ ᴍᴀxɪᴍᴜᴍ ᴏꜰ 5 ᴘʟᴀʏʟɪsᴛs.</b>\n<i>ᴘʟᴇᴀsᴇ ᴅᴇʟᴇᴛᴇ ᴀ ᴘʟᴀʏʟɪsᴛ ʙᴇꜰᴏʀᴇ ᴄʀᴇᴀᴛɪɴɢ ᴀ ɴᴇᴡ ᴏɴᴇ.</i>"
+    PLAYLIST_ASK_NAME = (
+        f"{EmojiTag.ADD} <b>ᴄʀᴇᴀᴛᴇ ᴀ ɴᴇᴡ ᴘʟᴀʏʟɪsᴛ</b>\n\n"
+        f"{EmojiTag.INFO} <b>ᴘʟᴇᴀsᴇ sᴇɴᴅ ᴀ ɴᴀᴍᴇ ꜰᴏʀ ʏᴏᴜʀ ɴᴇᴡ ᴘʟᴀʏʟɪsᴛ:</b>\n\n"
+        "<b>‣ ʀᴜʟᴇs:</b>\n"
+        "• <i>ᴍᴀxɪᴍᴜᴍ 10 ᴄʜᴀʀᴀᴄᴛᴇʀs</i>\n"
+        "• <i>ʟᴇᴛᴛᴇʀs &amp; ɴᴜᴍʙᴇʀs ᴏɴʟʏ (<code>a-z, A-Z, 0-9</code>)</i>\n"
+        "• <i>ɴᴏ sᴘᴀᴄᴇs, sʏᴍʙᴏʟs, ᴏʀ sᴘᴇᴄɪᴀʟ ᴄʜᴀʀᴀᴄᴛᴇʀs</i>"
+    )
+    PLAYLIST_ASK_RENAME = (
+        f"{EmojiTag.TOOLS} <b>ʀᴇɴᴀᴍᴇ ᴘʟᴀʏʟɪsᴛ: <code>{0}</code></b>\n\n"
+        f"{EmojiTag.INFO} <b>ᴘʟᴇᴀsᴇ sᴇɴᴅ ᴛʜᴇ ɴᴇᴡ ɴᴀᴍᴇ:</b>\n\n"
+        "<b>‣ ʀᴜʟᴇs:</b>\n"
+        "• <i>ᴍᴀxɪᴍᴜᴍ 10 ᴄʜᴀʀᴀᴄᴛᴇʀs</i>\n"
+        "• <i>ʟᴇᴛᴛᴇʀs &amp; ɴᴜᴍʙᴇʀs ᴏɴʟʏ (<code>a-z, A-Z, 0-9</code>)</i>\n"
+        "• <i>ɴᴏ sᴘᴀᴄᴇs, sʏᴍʙᴏʟs, ᴏʀ sᴘᴇᴄɪᴀʟ ᴄʜᴀʀᴀᴄᴛᴇʀs</i>"
+    )
+    PLAYLIST_INVALID_NAME = (
+        f"{EmojiTag.ERROR} <b>ɪɴᴠᴀʟɪᴅ ᴘʟᴀʏʟɪsᴛ ɴᴀᴍᴇ!</b>\n\n"
+        "<b>‣ ᴍᴜsᴛ ʙᴇ 1–10 ᴀʟᴘʜᴀɴᴜᴍᴇʀɪᴄ ᴄʜᴀʀᴀᴄᴛᴇʀs ᴏɴʟʏ (ɴᴏ sᴘᴀᴄᴇs ᴏʀ sʏᴍʙᴏʟs).</b>\n"
+        "<i>ᴘʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ:</i>"
+    )
+    PLAYLIST_NAME_EXISTS = f"{EmojiTag.WARNING} <b>ᴀ ᴘʟᴀʏʟɪsᴛ ᴡɪᴛʜ ᴛʜɪs ɴᴀᴍᴇ ᴀʟʀᴇᴀᴅʏ ᴇxɪsᴛs!</b>\n<i>ᴘʟᴇᴀsᴇ ᴄʜᴏᴏsᴇ ᴀ ᴅɪꜰꜰᴇʀᴇɴᴛ ɴᴀᴍᴇ:</i>"
+    PLAYLIST_CREATED = f"{EmojiTag.SUCCESS} <b>ᴘʟᴀʏʟɪsᴛ <code>{{0}}</code> ᴄʀᴇᴀᴛᴇᴅ sᴜᴄᴄᴇssꜰᴜʟʟʏ!</b>"
+    PLAYLIST_CREATED_AND_ADDED = f"{EmojiTag.SUCCESS} <b>ᴘʟᴀʏʟɪsᴛ <code>{{0}}</code> ᴄʀᴇᴀᴛᴇᴅ ᴀɴᴅ <code>{{1}}</code> ᴀᴅᴅᴇᴅ!</b>"
+    PLAYLIST_RENAMED = f"{EmojiTag.SUCCESS} <b>ᴘʟᴀʏʟɪsᴛ ʀᴇɴᴀᴍᴇᴅ ᴛᴏ <code>{{0}}</code>!</b>"
+    PLAYLIST_DELETED = f"{EmojiTag.SUCCESS} <b>ᴘʟᴀʏʟɪsᴛ <code>{{0}}</code> ᴅᴇʟᴇᴛᴇᴅ sᴜᴄᴄᴇssꜰᴜʟʟʏ!</b>"
+    PLAYLIST_SONG_DELETED = f"{EmojiTag.SUCCESS} <b>ᴛʀᴀᴄᴋ ʀᴇᴍᴏᴠᴇᴅ ꜰʀᴏᴍ ᴘʟᴀʏʟɪsᴛ.</b>"
+    PLAYLIST_EMPTY = f"{EmojiTag.QUEUE_ICON} <b>ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴀɴʏ ᴘʟᴀʏʟɪsᴛs ʏᴇᴛ.</b>\n<i>ᴛᴀᴘ ʙᴇʟᴏᴡ ᴛᴏ ᴄʀᴇᴀᴛᴇ ʏᴏᴜʀ ꜰɪʀsᴛ ᴘʟᴀʏʟɪsᴛ!</i>"
+    PLAYLIST_TRACKS_EMPTY = f"{EmojiTag.QUEUE_ICON} <b>ᴛʜɪs ᴘʟᴀʏʟɪsᴛ ʜᴀs ɴᴏ sᴏɴɢs ʏᴇᴛ.</b>\n<i>ᴛᴀᴘ '➕ ᴀᴅᴅ ᴛᴏ ᴘʟᴀʏʟɪsᴛ' ᴏɴ ᴀɴʏ ɴᴏᴡ ᴘʟᴀʏɪɴɢ ᴄᴀʀᴅ ᴛᴏ ᴀᴅᴅ sᴏɴɢs!</i>"
+    PLAYLIST_NOT_FOUND = f"{EmojiTag.ERROR} <b>ᴘʟᴀʏʟɪsᴛ ɴᴏᴛ ꜰᴏᴜɴᴅ.</b>"
+    PLAYLIST_NO_ACTIVE_SONG = f"{EmojiTag.WARNING} <b>ɴᴏ sᴏɴɢ ɪs ᴄᴜʀʀᴇɴᴛʟʏ ᴘʟᴀʏɪɴɢ ɪɴ ᴛʜɪs ᴄʜᴀᴛ.</b>"
+    PLAYLIST_PLAYING = f"{EmojiTag.PLAY} <b>ǫᴜᴇᴜᴇᴅ {{0}} ᴛʀᴀᴄᴋs ꜰʀᴏᴍ ᴘʟᴀʏʟɪsᴛ '{{1}}' ᴛᴏ ᴠᴏɪᴄᴇ ᴄʜᴀᴛ!</b>"
+
+
