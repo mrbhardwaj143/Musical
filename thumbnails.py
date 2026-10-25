@@ -1,0 +1,614 @@
+import asyncio
+import random
+import os
+import re
+import hashlib
+import threading
+import uuid
+import aiofiles
+import aiohttp
+import numpy as np
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+
+import logging
+from media_guard import get_media_proxy
+logger = logging.getLogger(__name__)
+
+_session = None
+
+# Thumbnail URLs are third-party (YouTube/Spotify CDNs, and whatever art a track
+# carries), so the fetch gets a hard deadline and a size cap. Without the deadline
+# a stalled CDN holds up the /play card behind aiohttp's 5-minute default; without
+# the cap an oversized or hostile body is read wholly into memory and onto disk.
+# A rendered card's source art is ~100 KB, so 8 MB is generous.
+_THUMB_TIMEOUT = aiohttp.ClientTimeout(total=20, connect=10)
+_THUMB_MAX_BYTES = 8 * 1024 * 1024
+_THUMB_CHUNK = 64 * 1024
+
+
+def _get_session():
+    """Reused aiohttp session so cache-miss thumbnail downloads keep the
+    TCP/TLS connection alive instead of a fresh handshake each time."""
+    global _session
+    if _session is None or _session.closed:
+        _session = aiohttp.ClientSession(timeout=_THUMB_TIMEOUT)
+    return _session
+
+
+async def close_session():
+    """Gracefully close the global aiohttp session on shutdown."""
+    global _session
+    if _session is not None and not _session.closed:
+        await _session.close()
+        _session = None
+
+
+def draw_heart(draw, center_x, center_y, size, outline_color, fill_color=None, width=2):
+    import math
+    points = []
+    scale = size / 32.0
+    y_offset = 3.75 * scale
+    for degree in range(0, 360, 5):
+        t = math.radians(degree)
+        x = 16 * (math.sin(t) ** 3)
+        y = -(13 * math.cos(t) - 5 * math.cos(2*t) - 2 * math.cos(3*t) - math.cos(4*t))
+        points.append((center_x + x * scale, center_y + y * scale - y_offset))
+    draw.polygon(points, outline=outline_color, fill=fill_color, width=width)
+
+
+def render_thumb(image_path, title, duration, channel, views, videoid, random_id):
+    """Render the final thumbnail image from a local source file."""
+    temp_files_to_delete = []
+
+    # Default values for channel and views if None
+    channel = channel or "Telegram"
+    views = views or "1M"
+
+    youtube = Image.open(image_path)
+    image1 = changeImageSize(1280, 720, youtube)
+    image2 = image1.convert("RGBA")
+
+    # Create premium multi-gradient background
+    # SPEED OPTIMIZATION: Downscale before blur, upscale after.
+    # Blurring a 1280x720 image takes ~50-80ms. Blurring 320x180 takes ~3ms!
+    small_bg = image2.resize((320, 180), resample=Image.Resampling.BILINEAR)
+    small_bg = small_bg.filter(filter=ImageFilter.GaussianBlur(4)) # Scaled down blur radius ~15/4
+    background = small_bg.resize((1280, 720), resample=Image.Resampling.BICUBIC)
+
+    enhancer = ImageEnhance.Brightness(background)
+    background = enhancer.enhance(0.08)
+
+    # Create sophisticated tri-color gradient
+    gradient_colors = [
+        (138, 43, 226),
+        (220, 20, 60),
+        (255, 140, 0),
+        (0, 191, 255),
+        (255, 20, 147),
+        (50, 205, 50)
+    ]
+
+    primary_color = random.choice(gradient_colors)
+    gradient_colors.remove(primary_color)
+    secondary_color = random.choice(gradient_colors)
+
+    gradient_arr = np.zeros((720, 1280, 4), dtype=np.uint8)
+    y_range = np.arange(720)
+    alphas = (40 * y_range / 720).astype(np.uint8)
+    for c, (pc, sc) in enumerate(zip(primary_color, secondary_color)):
+        gradient_arr[:, :, c] = np.clip(
+            (pc + (sc - pc) * y_range / 720), 0, 255
+        ).astype(np.uint8)[:, np.newaxis]
+    gradient_arr[:, :, 3] = alphas[:, np.newaxis]
+    gradient = Image.fromarray(gradient_arr, 'RGBA')
+
+    background = Image.alpha_composite(background, gradient)
+
+    noise_arr = np.zeros((720, 1280, 4), dtype=np.uint8)
+    mask = np.random.random((720, 1280)) > 0.97
+    noise_arr[mask, 3] = np.random.randint(10, 31, size=mask.sum()).astype(np.uint8)
+    noise_arr[mask, :3] = 255
+    noise = Image.fromarray(noise_arr, 'RGBA')
+    background = Image.alpha_composite(background, noise)
+
+    draw = ImageDraw.Draw(background)
+
+    try:
+        title_font = ImageFont.truetype("Poppins-Bold.ttf", 52)
+    except Exception:
+        title_font = ImageFont.load_default()
+
+    try:
+        subtitle_font = ImageFont.truetype("Poppins-Medium.ttf", 28)
+    except Exception:
+        subtitle_font = ImageFont.load_default()
+
+    try:
+        info_font = ImageFont.truetype("Poppins-Regular.ttf", 24)
+    except Exception:
+        info_font = ImageFont.load_default()
+
+    try:
+        time_font = ImageFont.truetype("Poppins-Medium.ttf", 26)
+    except Exception:
+        time_font = ImageFont.load_default()
+
+    card_x, card_y = 80, 80
+    card_width, card_height = 1120, 560
+
+    # PERFORMANCE: Glass card blur is very subtle, using a solid layered box or small box blur is faster
+    # than GaussianBlur if not needed, but for precision we keep GaussianBlur on the small mask or bypass if too slow.
+    glass_card = Image.new('RGBA', (card_width, card_height), (15, 15, 15, 160))
+    glass_draw = ImageDraw.Draw(glass_card)
+    corner_radius = 30
+    glass_draw.rounded_rectangle(
+        [(0, 0), (card_width, card_height)],
+        radius=corner_radius,
+        fill=(15, 15, 15, 160),
+        outline=(255, 255, 255, 35),
+        width=2
+    )
+    # Removing redundant GaussianBlur on a virtually solid 160-alpha color.
+    # glass_card = glass_card.filter(ImageFilter.GaussianBlur(2))
+    background.paste(glass_card, (card_x, card_y), glass_card)
+
+    # Draw heart icon outline in the upper-right corner of the player card
+    heart_center_x = card_x + card_width - 65
+    heart_center_y = card_y + 55
+    heart_size = 28
+    # Heart Shadow
+    draw_heart(draw, heart_center_x + 2, heart_center_y + 2, heart_size, outline_color=(0, 0, 0, 150), width=2)
+    # Heart Outline
+    draw_heart(draw, heart_center_x, heart_center_y, heart_size, outline_color=(255, 255, 255, 220), width=2)
+
+    album_size = 340
+    album_border = 8
+    neon_glow_color = (255, 255, 255)
+
+    for glow_layer in range(3, 0, -1):
+        glow_size = album_size + (glow_layer * 20)
+        glow = Image.new('RGBA', (glow_size, glow_size), (0, 0, 0, 0))
+        glow_draw = ImageDraw.Draw(glow)
+        glow_alpha = max(10, 50 - (glow_layer * 15))
+        glow_draw.ellipse(
+            [(0, 0), (glow_size, glow_size)],
+            fill=neon_glow_color + (glow_alpha,)
+        )
+        glow = glow.filter(ImageFilter.GaussianBlur(15 + glow_layer * 5))
+        glow_pos = (
+            card_x + 60 - (glow_size - album_size) // 2,
+            card_y + (card_height - glow_size) // 2
+        )
+        background.paste(glow, glow_pos, glow)
+
+    circle_thumbnail = crop_center_circle(youtube, album_size, album_border, (255, 255, 255), crop_scale=1.3)
+    album_position = (card_x + 60, card_y + (card_height - album_size) // 2)
+    background.paste(circle_thumbnail, album_position, circle_thumbnail)
+
+    text_x = card_x + album_size + 120
+    text_area_width = card_width - album_size - 180
+    title1 = wrap_text_to_width(draw, title, title_font, text_area_width, max_lines=2)
+    title_y = card_y + 100
+
+    # Draw active audio waveform icon
+    waveform_x = text_x
+    waveform_width = 25
+    y_center = (title_y - 45) + 12
+    bar_heights = [10, 20, 15, 8]
+    bar_width = 3
+    bar_gap = 3
+
+    # Waveform Shadow
+    for i, h in enumerate(bar_heights):
+        bx1 = waveform_x + i * (bar_width + bar_gap) + 2
+        by1 = y_center - h // 2 + 2
+        bx2 = bx1 + bar_width
+        by2 = y_center + h // 2 + 2
+        draw.rounded_rectangle([(bx1, by1), (bx2, by2)], radius=1, fill=(0, 0, 0, 150))
+
+    # Main Waveform
+    for i, h in enumerate(bar_heights):
+        bx1 = waveform_x + i * (bar_width + bar_gap)
+        by1 = y_center - h // 2
+        bx2 = bx1 + bar_width
+        by2 = y_center + h // 2
+        draw.rounded_rectangle([(bx1, by1), (bx2, by2)], radius=1, fill=(255, 255, 255))
+
+    label_text = "NOW PLAYING"
+    label_text_x = text_x + waveform_width + 10
+    draw_text_with_shadow(background, draw, (label_text_x, title_y - 45), label_text, info_font, (255, 255, 255), shadow_offset=(2, 2), shadow_blur=3)
+    if title1:
+        draw_text_with_shadow(background, draw, (text_x, title_y), title1[0], title_font, (255, 255, 255), shadow_offset=(3, 3), shadow_blur=6)
+    if len(title1) > 1 and title1[1]:
+        draw_text_with_shadow(background, draw, (text_x, title_y + 60), title1[1], title_font, (255, 255, 255), shadow_offset=(3, 3), shadow_blur=6)
+
+    artist_y = title_y + 140
+    artist_text = f"{channel}"
+    draw_text_with_shadow(background, draw, (text_x, artist_y), artist_text, subtitle_font, (220, 220, 255), shadow_offset=(2, 2), shadow_blur=4)
+
+    # Draw verified checkmark badge
+    artist_bbox = draw.textbbox((0, 0), artist_text, font=subtitle_font)
+    artist_width = artist_bbox[2] - artist_bbox[0]
+    badge_x = text_x + artist_width + 12
+    badge_y = artist_y + 16
+    badge_radius = 9
+    # Shadow
+    draw.ellipse(
+        [badge_x - badge_radius + 2, badge_y - badge_radius + 2,
+         badge_x + badge_radius + 2, badge_y + badge_radius + 2],
+        fill=(0, 0, 0, 150)
+    )
+    # Badge circle
+    draw.ellipse(
+        [badge_x - badge_radius, badge_y - badge_radius,
+         badge_x + badge_radius, badge_y + badge_radius],
+        fill=(255, 255, 255, 200)
+    )
+    # Checkmark lines inside circle
+    draw.line([(badge_x - 4, badge_y), (badge_x - 1, badge_y + 3)], fill=(40, 40, 40), width=2)
+    draw.line([(badge_x - 1, badge_y + 3), (badge_x + 4, badge_y - 3)], fill=(40, 40, 40), width=2)
+
+    views_text = f"{views[:23]} views"
+    draw_text_with_shadow(background, draw, (text_x, artist_y + 40), views_text, info_font, (200, 200, 230), shadow_offset=(2, 2), shadow_blur=3)
+
+    progress_y = card_y + card_height - 140
+    progress_x = text_x
+    progress_width = text_area_width - 20
+    progress_height = 6
+
+    track_bg = Image.new('RGBA', (progress_width, progress_height + 20), (0, 0, 0, 0))
+    track_draw = ImageDraw.Draw(track_bg)
+    track_draw.rounded_rectangle(
+        [(0, 10), (progress_width, 10 + progress_height)],
+        radius=progress_height // 2,
+        fill=(255, 255, 255, 60)
+    )
+    background.paste(track_bg, (progress_x, progress_y), track_bg)
+
+    is_live_duration = duration in ("Live", "Live Stream") or "live" in str(duration).lower()
+
+    if not is_live_duration:
+        progress_percentage = random.uniform(0.15, 0.85)
+        filled_width = int(progress_width * progress_percentage)
+
+        # Draw filled progress bar in solid white
+        draw.rounded_rectangle(
+            [(progress_x, progress_y + 10), (progress_x + filled_width, progress_y + 10 + progress_height)],
+            radius=progress_height // 2,
+            fill=(255, 255, 255, 255)
+        )
+
+        indicator_x = progress_x + filled_width
+        indicator_y = progress_y + 13
+        indicator_radius = 10
+        for glow in range(3, 0, -1):
+            glow_radius = indicator_radius + glow * 3
+            draw.ellipse(
+                [indicator_x - glow_radius, indicator_y - glow_radius,
+                 indicator_x + glow_radius, indicator_y + glow_radius],
+                fill=(255, 255, 255, 30)
+            )
+        draw.ellipse(
+            [indicator_x - indicator_radius, indicator_y - indicator_radius,
+             indicator_x + indicator_radius, indicator_y + indicator_radius],
+            fill=(255, 255, 255, 255)
+        )
+    else:
+        live_bar = Image.new('RGBA', (progress_width, progress_height + 20), (0, 0, 0, 0))
+        live_draw = ImageDraw.Draw(live_bar)
+        live_draw.rounded_rectangle(
+            [(0, 10), (progress_width, 10 + progress_height)],
+            radius=progress_height // 2,
+            fill=(255, 40, 40, 220)
+        )
+        live_bar = live_bar.filter(ImageFilter.GaussianBlur(1))
+        background.paste(live_bar, (progress_x, progress_y), live_bar)
+
+        pulse_x = progress_x + progress_width - 20
+        pulse_y = progress_y + 13
+        for pulse in range(2, 0, -1):
+            pulse_radius = 8 + pulse * 4
+            draw.ellipse(
+                [pulse_x - pulse_radius, pulse_y - pulse_radius,
+                 pulse_x + pulse_radius, pulse_y + pulse_radius],
+                fill=(255, 40, 40, 100 - pulse * 30)
+            )
+
+    time_y = progress_y + 30
+    draw_text_with_shadow(background, draw, (progress_x, time_y), "00:00", time_font, (200, 200, 240), shadow_offset=(1, 1), shadow_blur=2)
+
+    duration_display = "LIVE" if is_live_duration else duration
+    duration_color = (255, 80, 80) if is_live_duration else (200, 200, 240)
+    draw_text_with_shadow(background, draw, (progress_x + progress_width - 80, time_y), duration_display, time_font, duration_color, shadow_offset=(1, 1), shadow_blur=2)
+
+    try:
+        play_icons = Image.open("play_icons.png")
+        icon_width = min(520, text_area_width - 40)
+        play_icons = play_icons.resize((icon_width, int(62 * icon_width / 580)))
+        icons_with_glow = Image.new('RGBA', play_icons.size, (0, 0, 0, 0))
+        icons_with_glow.paste(play_icons, (0, 0), play_icons)
+        icons_position = (progress_x + (progress_width - icon_width) // 2, time_y + 50)
+        background.paste(icons_with_glow, icons_position, icons_with_glow)
+    except Exception:
+        play_y = time_y + 60
+        play_x = progress_x + progress_width // 2
+        draw.ellipse(
+            [play_x - 30, play_y - 30, play_x + 30, play_y + 30],
+            fill=(255, 255, 255, 200),
+            outline=primary_color + (255,),
+            width=3
+        )
+        draw.polygon(
+            [(play_x - 10, play_y - 15), (play_x - 10, play_y + 15), (play_x + 15, play_y)],
+            fill=primary_color + (255,)
+        )
+
+    background = background.convert("RGB")
+    background_path = f"cache/{random_id}_{videoid}_premium.png"
+    # Write to a unique temp file then atomically rename: a concurrent get_thumb
+    # checks os.path.exists(cached_card), so saving in place would let it return
+    # (and upload) a half-written PNG.
+    tmp_path = f"{background_path}.{os.getpid()}.{threading.get_ident()}.tmp"
+    background.save(tmp_path, format="PNG", optimize=False)
+    os.replace(tmp_path, background_path)
+
+    for temp_file in temp_files_to_delete:
+        try:
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
+        except Exception as e:
+            logger.debug(f"[render_thumb] Temp file cleanup failed for {temp_file} (video {videoid}): {e}")
+
+    return background_path
+
+def changeImageSize(maxWidth, maxHeight, image):
+    widthRatio = maxWidth / image.size[0]
+    heightRatio = maxHeight / image.size[1]
+    newWidth = int(widthRatio * image.size[0])
+    newHeight = int(heightRatio * image.size[1])
+    newImage = image.resize((newWidth, newHeight))
+    return newImage
+
+def truncate(text):
+    list = text.split(" ")
+    text1 = ""
+    text2 = ""
+    for i in list:
+        if len(text1) + len(i) < 30:
+            text1 += " " + i
+        elif len(text2) + len(i) < 30:
+            text2 += " " + i
+
+    text1 = text1.strip()
+    text2 = text2.strip()
+    return [text1,text2]
+
+def wrap_text_to_width(draw, text, font, max_width, max_lines=2):
+    """Wrap text so each line fits within the requested pixel width."""
+    if not text:
+        return [""]
+
+    words = text.split()
+    lines = []
+    current_line = ""
+
+    for word in words:
+        candidate = f"{current_line} {word}".strip()
+        if draw.textbbox((0, 0), candidate, font=font)[2] <= max_width:
+            current_line = candidate
+            continue
+
+        if current_line:
+            lines.append(current_line)
+            if len(lines) >= max_lines:
+                break
+            current_line = word
+        else:
+            current_line = word
+
+        while current_line and draw.textbbox((0, 0), current_line, font=font)[2] > max_width:
+            if len(current_line) <= 1:
+                break
+            current_line = current_line[:-1]
+
+    if len(lines) < max_lines and current_line:
+        lines.append(current_line)
+
+    if len(lines) > max_lines:
+        lines = lines[:max_lines]
+
+    if len(lines) == max_lines and " ".join(words) != " ".join(lines):
+        last_line = lines[-1]
+        ellipsis = "..."
+        while last_line and draw.textbbox((0, 0), f"{last_line}{ellipsis}", font=font)[2] > max_width:
+            last_line = last_line[:-1]
+        lines[-1] = f"{last_line}{ellipsis}" if last_line else ellipsis
+
+    return lines or [text]
+
+def random_color():
+    return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+def generate_gradient(width, height, start_color, end_color):
+    base = Image.new('RGBA', (width, height), start_color)
+    top = Image.new('RGBA', (width, height), end_color)
+    mask = Image.new('L', (width, height))
+    mask_data = []
+    for y in range(height):
+        mask_data.extend([int(60 * (y / height))] * width)
+    mask.putdata(mask_data)
+    base.paste(top, (0, 0), mask)
+    return base
+
+def add_border(image, border_width, border_color):
+    width, height = image.size
+    new_width = width + 2 * border_width
+    new_height = height + 2 * border_width
+    new_image = Image.new("RGBA", (new_width, new_height), border_color)
+    new_image.paste(image, (border_width, border_width))
+    return new_image
+
+def crop_center_circle(img, output_size, border, border_color, crop_scale=1.5):
+    half_the_width = img.size[0] / 2
+    half_the_height = img.size[1] / 2
+    larger_size = int(output_size * crop_scale)
+    img = img.crop(
+        (
+            half_the_width - larger_size/2,
+            half_the_height - larger_size/2,
+            half_the_width + larger_size/2,
+            half_the_height + larger_size/2
+        )
+    )
+
+    img = img.resize((output_size - 2*border, output_size - 2*border))
+
+
+    final_img = Image.new("RGBA", (output_size, output_size), border_color)
+
+
+    mask_main = Image.new("L", (output_size - 2*border, output_size - 2*border), 0)
+    draw_main = ImageDraw.Draw(mask_main)
+    draw_main.ellipse((0, 0, output_size - 2*border, output_size - 2*border), fill=255)
+
+    final_img.paste(img, (border, border), mask_main)
+
+
+    mask_border = Image.new("L", (output_size, output_size), 0)
+    draw_border = ImageDraw.Draw(mask_border)
+    draw_border.ellipse((0, 0, output_size, output_size), fill=255)
+
+    result = Image.composite(final_img, Image.new("RGBA", final_img.size, (0, 0, 0, 0)), mask_border)
+
+    return result
+
+def draw_text_with_shadow(background, draw, position, text, font, fill, shadow_offset=(3, 3), shadow_blur=5):
+
+    shadow = Image.new('RGBA', background.size, (0, 0, 0, 0))
+    shadow_draw = ImageDraw.Draw(shadow)
+
+
+    shadow_draw.text(position, text, font=font, fill="black")
+
+
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=shadow_blur))
+
+
+    background.paste(shadow, shadow_offset, shadow)
+
+
+    draw.text(position, text, font=font, fill=fill)
+
+
+async def _download_thumb(resp, dest_path) -> bool:
+    """Stream a thumbnail response body to dest_path under a size cap.
+
+    Returns False when the body is missing or larger than _THUMB_MAX_BYTES, so the
+    caller falls back to the bundled placeholder rather than rendering a truncated
+    image. Cleanup of a partial file is the caller's (it already tracks the path in
+    temp_files_to_delete).
+    """
+    declared = resp.headers.get("Content-Length")
+    if declared and declared.isdigit() and int(declared) > _THUMB_MAX_BYTES:
+        logger.warning(f"[thumbnails] Refusing thumbnail: declared {declared} bytes exceeds cap")
+        return False
+
+    written = 0
+    # `async with` matters here: the previous open/write/close sequence leaked the
+    # descriptor whenever the write or the socket read raised.
+    async with aiofiles.open(dest_path, mode="wb") as f:
+        async for chunk in resp.content.iter_chunked(_THUMB_CHUNK):
+            written += len(chunk)
+            if written > _THUMB_MAX_BYTES:
+                logger.warning(f"[thumbnails] Refusing thumbnail: body exceeded {_THUMB_MAX_BYTES} bytes")
+                return False
+            await f.write(chunk)
+    return written > 0
+
+
+async def get_thumb(title, duration, thumbnail, channel=None, views=None, videoid=None, track_id=None, chat_id=None, update_callback=None):
+    temp_files_to_delete = []
+    try:
+        random_id = str(uuid.uuid4())[:8]
+
+        if videoid:
+            videoid = str(videoid).replace('/', '_').replace('\\', '_').replace(':', '_').replace('*', '_').replace('?', '_').replace('"', '_').replace('<', '_').replace('>', '_').replace('|', '_')
+        else:
+            videoid = "unknown"
+
+        if thumbnail is None:
+            thumbnail = "thumbnail.png"
+
+        # Rendered cards are deterministic for a (videoid, metadata) pair — the live
+        # progress lives in the button, not the image — so cache per song and skip the
+        # download + PIL render on repeat plays. render_thumb writes to
+        # cache/{random_id}_{videoid}_premium.png, so a deterministic id makes that
+        # path double as the cache path.
+        if videoid != "unknown":
+            random_id = hashlib.md5(f"{videoid}|{title}|{duration}|{channel}|{views}".encode()).hexdigest()[:12]
+            cached_card = f"cache/{random_id}_{videoid}_premium.png"
+            if os.path.exists(cached_card):
+                return cached_card
+
+        if os.path.exists(thumbnail):
+            image_path = thumbnail
+            if not title:
+                title = "Now Playing"
+        else:
+            # A failed or refused download degrades to the bundled placeholder so a
+            # slow CDN costs the card its art, not the whole /play response.
+            image_path = "thumbnail.png"
+            session = _get_session()
+            try:
+                async with session.get(thumbnail, proxy=await get_media_proxy()) as resp:
+                    if resp.status == 200:
+                        os.makedirs("cache", exist_ok=True)
+                        # random_id is a deterministic hash (so the rendered card can be
+                        # cached), which means two concurrent plays of the same track
+                        # derive the same download path and clobber/delete each other's
+                        # file mid-render. A uuid keeps the scratch download private.
+                        temp_thumb_path = f"cache/thumb_{uuid.uuid4().hex[:8]}_{videoid}.png"
+                        temp_files_to_delete.append(temp_thumb_path)
+                        if await _download_thumb(resp, temp_thumb_path):
+                            image_path = temp_thumb_path
+                    else:
+                        logger.warning(f"[thumbnails] Thumbnail fetch returned HTTP {resp.status} for {videoid}")
+            except asyncio.TimeoutError:
+                logger.warning(f"[thumbnails] Thumbnail fetch timed out for {videoid}")
+            except aiohttp.ClientError as e:
+                logger.warning(f"[thumbnails] Thumbnail fetch failed for {videoid}: {type(e).__name__} - {e}")
+
+        background_path = await asyncio.to_thread(
+            render_thumb,
+            image_path,
+            title,
+            duration,
+            channel,
+            views,
+            videoid,
+            random_id,
+        )
+
+        # If provided, notify caller that thumbnail is ready
+        if update_callback and track_id and chat_id:
+            try:
+                update_callback(track_id, chat_id, {'thumb': background_path})
+            except Exception as e:
+                logger.debug(f"[get_thumb] Thumbnail-ready callback failed for track {track_id} in chat {chat_id}: {e}")
+
+        return background_path
+
+    except Exception as e:
+        print(f"Error generating thumbnail for video {videoid}: {e}")
+        logger.error(f"Error generating thumbnail for video {videoid}: {type(e).__name__} - {e}", exc_info=True)
+        return None
+
+    finally:
+        # Runs on the error path too: a failed download or render used to leak its
+        # scratch file into cache/ until the 6h janitor sweep.
+        for temp_file in temp_files_to_delete:
+            try:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+            except Exception as e:
+                logger.debug(f"[get_thumb] Temp file cleanup failed for {temp_file} (video {videoid}): {e}")
