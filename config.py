@@ -75,7 +75,7 @@ def is_bot_owner(user_id) -> bool:
 
 # ── Sensitive — must be set via environment, no defaults ────────────────────────
 BOT_TOKEN       = os.getenv("BOT_TOKEN", "")
-STRING_SESSION  = os.getenv("STRING_SESSION", os.getenv("STRING_SESSION1", "BAFjR_wAd07Gi3AZfwTgdidFbI6iYJYCX1Cri3HI4v6SefpOwG36QIndpsqHhcEXfPrlzJLoUrTNbrlpMdfBchnXoGT-7X8ZqEDacfsJ120YMnF4xybtN6Vaolq2WbxNsaet8YZH6CHtyAODkRMkRqHQYtX-Y9fGnjTkQX55d9j8p4QsW-mY8Qa2ABVOp57NZX9LAeWa0okjAEO7-F5ExiuEIFMMUghXH_XwiN2gtep0sqr6gBghyQbKDL_T9_i5xX7wNjiOjLdrkPuV2maMOHkdJs6eLX7u9zQg99NEt2FXBKMceWumNr1GDQAQ5Fngle4NUYO6R7Qlp8zyJoaQCCHhWeqkPAAAAAGCWcMIAA"))
+STRING_SESSION  = os.getenv("STRING_SESSION", os.getenv("STRING_SESSION1", ""))
 STRING_SESSION1 = os.getenv("STRING_SESSION1", STRING_SESSION)
 STRING_SESSION2 = os.getenv("STRING_SESSION2", "")
 STRING_SESSION3 = os.getenv("STRING_SESSION3", "")
@@ -105,7 +105,7 @@ except ValueError:
 ASSISTANT_LEAVE_DRY_RUN = os.getenv("ASSISTANT_LEAVE_DRY_RUN", "False").lower() in ("true", "1", "yes")
 
 try:
-    MONGODB_URI = os.environ["mongodb+srv://mibobef209_db_user:IWEtSqpyQhWf211J@cluster0.ugv1zms.mongodb.net/"]  # fail fast on startup if unset — never bake in a cluster
+    MONGODB_URI = os.environ["MONGODB_URI"]  # fail fast on startup if unset — never bake in a cluster
 except KeyError:
     raise SystemExit("MONGODB_URI is not set. Set it via environment (or .env for local dev) — no default cluster is baked in.")
 
