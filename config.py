@@ -105,7 +105,7 @@ except ValueError:
 ASSISTANT_LEAVE_DRY_RUN = os.getenv("ASSISTANT_LEAVE_DRY_RUN", "False").lower() in ("true", "1", "yes")
 
 try:
-    MONGODB_URI = os.environ["MONGODB_URI"]  # fail fast on startup if unset — never bake in a cluster
+    MONGODB_URI = os.environ["mongodb+srv://mibobef209_db_user:IWEtSqpyQhWf211J@cluster0.ugv1zms.mongodb.net/"]  # fail fast on startup if unset — never bake in a cluster
 except KeyError:
     raise SystemExit("MONGODB_URI is not set. Set it via environment (or .env for local dev) — no default cluster is baked in.")
 
