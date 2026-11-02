@@ -1,0 +1,148 @@
+
+{
+  "name": "NUB Music Bot",
+  "description": "🔥 Ultimate Telegram Voice Chat Music Bot — HD audio/video streaming, multi-language support, premium UI. Powered by Pyrogram (Kurigram) and PyTgCalls.",
+  "logo": "https://raw.githubusercontent.com/nub-coders/nub-music-bot/refs/heads/main/music.jpg",
+  "keywords": [
+    "python3",
+    "telegram",
+    "MusicBot",
+    "telegram-bot",
+    "pyrogram",
+    "voice-chat",
+    "pytgcalls"
+  ],
+  "env": {
+    "API_ID": {
+      "description": "Telegram App API ID",
+      "value": "2040",
+      "required": true
+    },
+    "API_HASH": {
+      "description": "Telegram App API Hash",
+      "value": "b18441a1ff607e10a989891a5462e627",
+      "required": true
+    },
+    "BOT_TOKEN": {
+      "description": "Bot token from @BotFather",
+      "value": "",
+      "required": true
+    },
+    "STRING_SESSION": {
+      "description": "Pyrogram user session string for primary assistant",
+      "value": "",
+      "required": true
+    },
+    "STRING_SESSION2": {
+      "description": "Second assistant session",
+      "value": "",
+      "required": false
+    },
+    "STRING_SESSION3": {
+      "description": "Third assistant session",
+      "value": "",
+      "required": false
+    },
+    "STRING_SESSION4": {
+      "description": "Fourth assistant session",
+      "value": "",
+      "required": false
+    },
+    "STRING_SESSION5": {
+      "description": "Fifth assistant session",
+      "value": "",
+      "required": false
+    },
+    "AUTO_LEAVING_ASSISTANT": {
+      "description": "Auto leave idle chats",
+      "value": "True",
+      "required": false
+    },
+    "ASSISTANT_LEAVE_TIME": {
+      "description": "Assistant idle leave time in seconds",
+      "value": "5400",
+      "required": false
+    },
+    "OWNER_ID": {
+      "description": "Your Telegram user ID",
+      "value": "",
+      "required": true
+    },
+    "MONGODB_URI": {
+      "description": "MongoDB connection string",
+      "value": "",
+      "required": true
+    },
+    "YOUTUBE_API_KEYS": {
+      "description": "Comma-separated YouTube API keys",
+      "value": "",
+      "required": false
+    },
+    "GROUP": {
+      "description": "Support group username",
+      "value": "nub_coder_s",
+      "required": false
+    },
+    "LOGGER_ID": {
+      "description": "Chat ID for error logs",
+      "value": "",
+      "required": false
+    },
+    "DB_NAME": {
+      "description": "MongoDB database name",
+      "value": "musicbot",
+      "required": false
+    },
+    "YTUBE_API_BASE_URL": {
+      "description": "External YouTube API proxy URL",
+      "value": "https://api.nubcoders.com",
+      "required": false
+    },
+    "YTUBE_API_TOKEN": {
+      "description": "External YouTube API token",
+      "value": "",
+      "required": false
+    },
+    "YT_COOKIES_FILE": {
+      "description": "Netscape cookies file path",
+      "value": "",
+      "required": false
+    },
+    "COOKIES_FROM_BROWSER": {
+      "description": "Browser cookies export",
+      "value": "",
+      "required": false
+    },
+    "COOKIES_BOOTSTRAP_URL": {
+      "description": "Cookies bootstrap URL",
+      "value": "",
+      "required": false
+    },
+    "COOKIES_REFRESH_HOURS": {
+      "description": "Cookies refresh interval",
+      "value": "",
+      "required": false
+    },
+    "SPOTIFY_CLIENT_ID": {
+      "description": "Spotify Client ID",
+      "value": "",
+      "required": false
+    },
+    "SPOTIFY_CLIENT_SECRET": {
+      "description": "Spotify Client Secret",
+      "value": "",
+      "required": false
+    },
+    "ALLOW_PRIVATE_STREAM_URLS": {
+      "description": "Allow private stream URLs",
+      "value": "False",
+      "required": false
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1
+    }
+  },
+  "stack": "container"
+}
