@@ -492,26 +492,52 @@ async def play_handler_func(client, message):
                         state.mark_member(ast_num, message.chat.id)
                         break
                     else:
-                        # Private group
-                        is_admin_or_owner = False
+                        # Private group. A bot being an administrator is not enough:
+                        # Telegram separately requires the "Invite Users via Link"
+                        # right to create a fresh invite link. Prefer an already
+                        # available group invite link; only create a new one when the
+                        # bot actually has that right.
+                        bot_can_invite = False
                         try:
                             bot_member = await client.get_chat_member(message.chat.id, client.me.id)
-                            is_admin_or_owner = bot_member.status in (
-                                ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER
-                            )
-                        except Exception:
-                            is_admin_or_owner = False
+                            if bot_member.status == ChatMemberStatus.OWNER:
+                                bot_can_invite = True
+                            elif bot_member.status == ChatMemberStatus.ADMINISTRATOR:
+                                bot_can_invite = bool(
+                                    getattr(getattr(bot_member, "privileges", None), "can_invite_users", False)
+                                )
+                        except Exception as perm_error:
+                            logger.warning(f"[play] Could not verify bot invite permission in {message.chat.id}: {perm_error}")
 
                         try:
                             joined_chat = await ast_session.get_chat(message.chat.id)
                             logger.info(f"[play] Assistant {ast_num} already in private group {message.chat.id}")
                         except Exception:
-                            if not is_admin_or_owner:
-                                await rich_edit(massage, rich_note(Messages.NEED_INVITE_PERMISSION), client=client)
-                                return await remove_active_chat(client, target_chat_id, generation=generation)
-                            expire_at = _dt.datetime.now(_dt.timezone.utc) + _dt.timedelta(seconds=60)
-                            link_obj = await client.create_chat_invite_link(message.chat.id, member_limit=1, expire_date=expire_at)
-                            joined_chat = await ast_session.join_chat(link_obj.invite_link)
+                            # get_chat failed: assistant is probably not a member.
+                            # Use a known primary invite link if Telegram exposes it.
+                            invite_link = getattr(message.chat, "invite_link", None)
+                            if not invite_link:
+                                try:
+                                    fresh_chat = await client.get_chat(message.chat.id)
+                                    invite_link = getattr(fresh_chat, "invite_link", None)
+                                except Exception as chat_error:
+                                    logger.debug(f"[play] Could not read existing invite link: {chat_error}")
+
+                            if not invite_link:
+                                if not bot_can_invite:
+                                    logger.warning(
+                                        f"[play] Bot lacks can_invite_users in private group {message.chat.id}; "
+                                        "grant 'Invite Users via Link' to the bot or add the assistant manually."
+                                    )
+                                    await rich_edit(massage, rich_note(Messages.NEED_INVITE_PERMISSION), client=client)
+                                    return await remove_active_chat(client, target_chat_id, generation=generation)
+                                expire_at = _dt.datetime.now(_dt.timezone.utc) + _dt.timedelta(seconds=60)
+                                link_obj = await client.create_chat_invite_link(
+                                    message.chat.id, member_limit=1, expire_date=expire_at
+                                )
+                                invite_link = link_obj.invite_link
+
+                            joined_chat = await ast_session.join_chat(invite_link)
                             logger.info(f"[play] Assistant {ast_num} joined private group {message.chat.id} via invite link")
                         target_chat = joined_chat if (joined_chat and hasattr(joined_chat, "id")) else message.chat
                         state.mark_member(ast_num, message.chat.id)
