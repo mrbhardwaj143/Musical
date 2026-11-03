@@ -24,7 +24,7 @@ except Exception as e:
 # ── Telegram (non-sensitive — safe as defaults) ───────────────────────────────
 API_ID      = os.getenv("API_ID", "2040")
 API_HASH    = os.getenv("API_HASH", "b18441a1ff607e10a989891a5462e627")
-GROUP       = os.getenv("GROUP", "nub_coder_s")
+GROUP       = os.getenv("GROUP", "aim_ras_2k26")
 
 # OWNER_ID grants unrestricted sudo (/reboot, /broadcast, auth bypass), so it
 # must never fall back to a baked-in identity: any deployment that forgot to set
